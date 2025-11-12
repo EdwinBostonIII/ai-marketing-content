@@ -1,149 +1,145 @@
-# SPLANTS Documentation Hub - Product Requirements Document
+# SPLANTS Marketing Engine - Product Requirements Document
 
-## Mission Statement
-
-A comprehensive, beautifully organized documentation browser that transforms 7,000+ lines of SPLANTS Marketing Engine documentation into an accessible, searchable, and delightful user experience.
+A clean, art gallery-inspired dashboard for small business owners to generate AI-powered marketing content with analytics and cost tracking.
 
 **Experience Qualities**:
-1. **Clarity** - Information is organized hierarchically and intuitively discoverable
-2. **Accessibility** - Complex technical concepts presented in digestible, visual chunks
-3. **Efficiency** - Users find what they need quickly through smart search and navigation
+1. **Clarity** - Information architecture prioritizes usability; small business owners can generate content in seconds
+2. **Minimalism** - 90% clean white canvas lets vibrant accent colors and content stand out like paint on canvas
+3. **Efficiency** - Fast content generation, readable analytics, and clear cost tracking
 
 **Complexity Level**: Light Application (multiple features with basic state)
-- Single-purpose documentation browsing
-- Multiple documents with navigation
-- Search and filter capabilities
-- Bookmarking and progress tracking
+- The interface is a tool for small business owners to generate marketing content and check analytics
+- Must be fast, easy to read, and usable first
+- Artistic touches come from deliberate splashes of color
 
 ## Essential Features
 
-### 1. Document Browser
-- **Functionality**: Display full documentation with proper markdown rendering
-- **Purpose**: Make 7,000+ lines of docs readable and navigable
-- **Trigger**: User selects document from sidebar or index
-- **Progression**: Select document → Load content → Render markdown → Display with TOC → Navigate sections
-- **Success criteria**: All markdown formats render correctly, navigation is smooth
+### 1. Content Generator
+- **Functionality**: AI-powered content generation with customizable parameters
+- **Purpose**: Create blog posts, social media content, emails, and ads instantly
+- **Trigger**: User clicks "Generate" tab or primary CTA
+- **Progression**: Select content type → Configure parameters (topic, tone, length) → Generate → View content with quality/SEO scores → Save or regenerate
+- **Success criteria**: Form is intuitive, generation takes <5 seconds, quality scores visible
 
-### 2. Smart Search
-- **Functionality**: Full-text search across all documentation with highlighted results
-- **Purpose**: Help users find specific information instantly
-- **Trigger**: User types in search bar
-- **Progression**: Type query → Debounced search → Show results with context → Click result → Jump to location
-- **Success criteria**: Sub-second search, relevant results, proper highlighting
+### 2. Analytics Dashboard
+- **Functionality**: Visual charts showing content performance and usage metrics
+- **Purpose**: Help business owners see what's working
+- **Trigger**: User navigates to Analytics/Dashboard
+- **Progression**: View dashboard → See bar/line charts in accent colors → Review quality/SEO scores as radial progress → Understand performance
+- **Success criteria**: Data is energetic and visual, charts use vibrant colors
 
-### 3. Quick Navigation Index
-- **Functionality**: Visual card-based index showing all documentation sections
-- **Purpose**: Provide overview of what's available and quick access
-- **Trigger**: User lands on home page or clicks "Documentation Index"
-- **Progression**: View index → Browse categories → Click card → Navigate to document
-- **Success criteria**: All 8 major documents accessible, clear categorization
+### 3. Content Library
+- **Functionality**: Browse and manage previously generated content
+- **Purpose**: Access and reuse past content
+- **Trigger**: User navigates to Library
+- **Progression**: View list → Filter by type/date/quality → Click to view details → Republish or edit
+- **Success criteria**: Easy to scan, sorted by recency, searchable
 
-### 4. Table of Contents Sidebar
-- **Functionality**: Auto-generated TOC from document headings with scroll-spy
-- **Purpose**: Show document structure and enable quick section jumping
-- **Trigger**: Document loads
-- **Progression**: Parse headings → Generate TOC → Track scroll position → Highlight current section
-- **Success criteria**: TOC syncs with scroll, click jumps to section
+### 4. Cost & Budget Tracking
+- **Functionality**: Display current usage against monthly budget with progress bars
+- **Purpose**: Keep business owners aware of spending
+- **Trigger**: Visible in header or settings page
+- **Progression**: View usage → See progress bar fill with accent color → Warning when approaching limit
+- **Success criteria**: Always visible, turns red near 100%, clear numbers
 
-### 5. Reading Progress Tracking
-- **Functionality**: Save user's reading position and mark completed sections
-- **Purpose**: Help users track their learning journey through extensive docs
-- **Trigger**: User scrolls through document
-- **Progression**: Track position → Save to KV → Show progress indicator → Restore on return
-- **Success criteria**: Progress persists between sessions, visual feedback
+### 5. Quality & SEO Scoring
+- **Functionality**: Radial progress bars showing quality and SEO scores
+- **Purpose**: Visual, artistic way to show content performance
+- **Trigger**: After content generation
+- **Progression**: Content generated → Scores calculated → Display as circular fills in accent colors
+- **Success criteria**: Intuitive, colorful, instantly readable
 
 ## Edge Case Handling
 
-- **Empty search results** - Show helpful suggestions and popular topics
-- **Long documents** - Implement virtual scrolling and lazy loading
-- **Broken markdown** - Graceful fallback rendering
-- **Mobile viewing** - Responsive layout with collapsible sidebar
-- **Deep linking** - Support direct URLs to specific sections
+- **Generation failures** - Clear error message with retry button
+- **Budget exceeded** - Warning modal, prevent further generation
+- **Empty library** - Helpful empty state with CTA to generate first content
+- **Long generation times** - Loading state with progress indicator
+- **Mobile usage** - Fully responsive, touch-friendly controls
 
 ## Design Direction
 
-The design should feel like a premium technical documentation site - clean, professional, focused on readability. Think Stripe Docs meets Notion. The interface should fade into the background, letting the content shine. Whitespace is generous, typography is impeccable, and navigation feels effortless.
+The interface should feel like a clean, white art gallery or minimalist artist's studio. The "canvas" (background) is pristine to make the "paint" (content and interactive elements) stand out. Usability comes first for small business owners who need speed and readability. The brand's artistic personality emerges through deliberate, high-impact splashes of color in buttons, charts, and scores.
 
 ## Color Selection
 
-**Triadic color scheme** balanced for technical documentation with warm accents for approachability.
+**Custom palette** - Black, Gold, White with artistic splatter aesthetic.
 
-- **Primary Color (Deep Blue)**: `oklch(0.45 0.09 250)` - Professional, trustworthy, technical depth. Used for primary navigation and interactive elements.
-- **Secondary Color (Soft Slate)**: `oklch(0.95 0.01 250)` - Neutral, recessive, content-focused. Used for backgrounds and subtle UI elements.
-- **Accent Color (Warm Orange)**: `oklch(0.70 0.13 50)` - Attention, energy, helpful. Used for highlights, badges, and calls-to-action.
+- **Primary Color (Charcoal Black)**: `oklch(0.20 0 0)` - Bold, professional, gallery walls. Used for headings and key text.
+- **Secondary Color (Bright Gold)**: `oklch(0.75 0.15 85)` - Vibrant, energetic, the "paint splatter." Used for primary buttons, active tabs, chart accents.
+- **Accent Color (Off-White)**: `oklch(0.98 0.005 85)` - Clean canvas, gallery white. Used for page background and card surfaces.
+- **Supporting (Pure White)**: `oklch(1 0 0)` - Brightest highlights on cards and elements.
 
 **Foreground/Background Pairings**:
-- **Background (Pure White)** `oklch(1 0 0)`: Dark text `oklch(0.2 0 0)` - Ratio 16.4:1 ✓
-- **Card (Light Gray)** `oklch(0.98 0 0)`: Dark text `oklch(0.2 0 0)` - Ratio 14.8:1 ✓
-- **Primary (Deep Blue)** `oklch(0.45 0.09 250)`: White text `oklch(1 0 0)` - Ratio 7.2:1 ✓
-- **Accent (Warm Orange)** `oklch(0.70 0.13 50)`: Dark text `oklch(0.2 0 0)` - Ratio 6.1:1 ✓
-- **Muted (Subtle Gray)** `oklch(0.92 0 0)`: Medium text `oklch(0.45 0 0)` - Ratio 5.8:1 ✓
+- **Background (Off-White)** `oklch(0.98 0.005 85)`: Charcoal text `oklch(0.20 0 0)` - Ratio 13.2:1 ✓
+- **Card (Pure White)** `oklch(1 0 0)`: Charcoal text `oklch(0.20 0 0)` - Ratio 15.8:1 ✓
+- **Primary Button (Gold)** `oklch(0.75 0.15 85)`: Black text `oklch(0.20 0 0)` - Ratio 8.1:1 ✓
+- **Charts**: Gold `oklch(0.75 0.15 85)`, Gold Dark `oklch(0.60 0.15 85)`, Charcoal `oklch(0.20 0 0)`
+- **Warning (Red)**: `oklch(0.55 0.22 25)` for budget warnings approaching 100%
 
 ## Font Selection
 
-Professional, highly readable typeface optimized for technical documentation with excellent number rendering.
+Headings should feel classy and quirky like a modern art gallery - old English style or similar. Body text must be extremely readable for generated content.
 
 - **Typographic Hierarchy**:
-  - **H1 (Document Title)**: Inter SemiBold/32px/tight (-0.02em)/1.2 line height
-  - **H2 (Major Section)**: Inter SemiBold/24px/tight (-0.01em)/1.3 line height
-  - **H3 (Subsection)**: Inter Medium/20px/normal/1.4 line height
-  - **H4 (Detail Header)**: Inter Medium/16px/normal/1.5 line height
-  - **Body (Content)**: Inter Regular/16px/normal/1.65 line height
-  - **Caption (Metadata)**: Inter Regular/14px/normal/1.5 line height
-  - **Code**: SF Mono/14px/normal/1.5 line height
+  - **H1 (App Title)**: Playfair Display Bold/32px/tight letter-spacing (-0.02em)/1.2 line height
+  - **H2 (Section Headers)**: Playfair Display SemiBold/24px/tight (-0.01em)/1.3 line height
+  - **H3 (Card Titles)**: Playfair Display Medium/20px/normal/1.4 line height
+  - **Body (Generated Content)**: Inter Regular/16px/normal/1.65 line height
+  - **UI Text (Buttons, Labels)**: Inter Medium/14px/normal/1.5 line height
+  - **Caption (Metadata)**: Inter Regular/13px/normal/1.4 line height
 
 ## Animations
 
-**Subtle and functional** - animations serve navigation clarity and provide feedback, never decoration.
+Subtle and purposeful. The "wet paint sheen" effect on buttons is the most prominent animation, plus smooth transitions that feel premium.
 
-- **Purposeful Meaning**: Smooth transitions between documents establish spatial relationships. Search results fade in to indicate new content. TOC highlights slide to show position changes.
-- **Hierarchy of Movement**: 
-  1. **Primary** - Page transitions and document loads (300ms ease-out)
-  2. **Secondary** - Search results and filter changes (200ms ease-in-out)
-  3. **Tertiary** - Hover states and micro-interactions (150ms ease-in-out)
+- **Purposeful Meaning**: Button hover creates a subtle shimmer/sheen like wet paint. Progress bars animate fills smoothly. Page transitions feel gallery-like.
+- **Hierarchy of Movement**:
+  1. **Primary** - Generate button with wet paint sheen (shimmer gradient animation)
+  2. **Secondary** - Progress bar fills and chart animations (300ms ease-out)
+  3. **Tertiary** - Hover states on cards and links (150ms ease-in-out)
 
 ## Component Selection
 
-- **Components**: 
-  - `ScrollArea` for document content with custom scrollbar styling
-  - `Card` for document index grid with hover elevation
-  - `Input` with `MagnifyingGlass` icon for search
-  - `Tabs` for switching between guides/references
-  - `Badge` for document metadata (reading time, lines, size)
-  - `Button` for navigation and actions
-  - `Separator` for visual hierarchy
-  - `Sidebar` for navigation structure
+- **Components**:
+  - `Card` with subtle shadows for content blocks
+  - `Button` with gold accent and optional paint sheen animation
+  - `Progress` bar for budget and radial for scores
+  - `Tabs` for switching between Generate/Analytics/Library
+  - `Input`, `Textarea`, `Select` for content generation form
+  - `Badge` for content type labels
+  - Custom radial progress for quality/SEO scores
+  - `recharts` for analytics dashboard with gold accents
   
 - **Customizations**:
-  - Custom markdown renderer with syntax highlighting
-  - Scroll-spy TOC with smooth scrolling
-  - Search result highlighter component
-  - Reading progress indicator
+  - Radial progress component for scores (circular fills)
+  - Wet paint sheen animation for primary button
+  - Subtle splatter texture for header/footer (low opacity, far from text)
+  - Custom color scheme for charts (gold, dark gold, charcoal)
   
 - **States**:
-  - Search: Empty, Loading, Results, No Results
-  - Documents: Loading skeleton, Loaded, Error
-  - TOC: Collapsed (mobile), Expanded (desktop), Active section highlighted
-  - Progress: Unread, In Progress, Completed
+  - Generate button: Rest, Hover (sheen), Active, Loading
+  - Content generation: Idle, Generating (loading), Success (show scores), Error
+  - Budget progress: Normal (gold), Warning (>80%, orange), Critical (>95%, red)
+  - Quality scores: Display as radial progress in gold
   
 - **Icon Selection**:
-  - `Book` - Documentation index
-  - `MagnifyingGlass` - Search
-  - `ListBullets` - Table of contents
-  - `BookmarkSimple` - Saved/bookmarked
-  - `CheckCircle` - Completed sections
-  - `ArrowRight` - Navigation
-  - `CaretRight` - Expandable sections
+  - `PaintBrushBroad` or `PaintBrush` - Primary generate icon
+  - `ChartBar` - Analytics
+  - `FolderOpen` - Library
+  - `Gauge` or `CircleHalf` - Quality/SEO scores
+  - `CurrencyDollar` - Cost tracking
+  - `Sparkle` - AI generation indicator
   
-- **Spacing**: 
-  - Container: `max-w-7xl mx-auto px-6`
-  - Section gaps: `gap-12` (major), `gap-6` (subsections)
-  - Content margins: `mb-8` (h2), `mb-4` (h3), `mb-3` (p)
+- **Spacing**:
+  - Container: `max-w-6xl mx-auto px-8`
+  - Section gaps: `gap-8` (major sections)
   - Card padding: `p-6` (standard), `p-8` (featured)
+  - Form spacing: `gap-4` between fields
   
-- **Mobile**: 
-  - Collapsible sidebar with overlay on mobile
-  - Sticky search bar at top
-  - Full-width content on small screens
-  - TOC as bottom sheet on mobile
-  - Reading progress as sticky top bar
+- **Mobile**:
+  - Stacked layout for forms
+  - Full-width cards
+  - Bottom tab navigation
+  - Collapsible sections for analytics
+  - Radial progress scales appropriately

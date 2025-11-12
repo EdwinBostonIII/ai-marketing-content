@@ -1,96 +1,122 @@
-import { useState, useMemo } from 'react'
-import { MagnifyingGlass, ArrowRight, Book } from '@phosphor-icons/react'
-import { Input } from '@/components/ui/input'
+import { ChartBar, TrendUp, FileText, Clock } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
-import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
-import { searchDocuments, documents } from '@/lib/documents'
+import { BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from 'recharts'
 
-interface SearchPageProps {
-  onNavigateToDocument: (docId: string) => void
-}
+const contentData = [
+  { month: 'Jan', posts: 12, quality: 85 },
+  { month: 'Feb', posts: 18, quality: 88 },
+  { month: 'Mar', posts: 15, quality: 92 },
+  { month: 'Apr', posts: 22, quality: 90 },
+  { month: 'May', posts: 28, quality: 94 },
+  { month: 'Jun', posts: 32, quality: 91 },
+]
 
-export default function SearchPage({ onNavigateToDocument }: SearchPageProps) {
-  const [query, setQuery] = useState('')
+const platformData = [
+  { name: 'Blog', count: 45 },
+  { name: 'Twitter', count: 78 },
+  { name: 'LinkedIn', count: 32 },
+  { name: 'Instagram', count: 56 },
+  { name: 'Facebook', count: 41 },
+]
 
-  const results = useMemo(() => {
-    if (query.trim().length < 3) return []
-    return searchDocuments(query)
-  }, [query])
-
+export default function DashboardPage() {
   return (
-    <div className="space-y-6 max-w-4xl mx-auto">
-      <div className="text-center">
-        <h1 className="text-3xl font-semibold tracking-tight mb-4">Search Documentation</h1>
-        <p className="text-muted-foreground mb-8">
-          Search across all 7,000+ lines of SPLANTS documentation
-        </p>
+    <div className="space-y-8">
+      <div>
+        <h1 className="text-4xl font-bold mb-2">Analytics Dashboard</h1>
+        <p className="text-muted-foreground">Track your content performance and engagement</p>
       </div>
 
-      <Card className="p-6">
-        <div className="relative">
-          <MagnifyingGlass className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground" size={24} />
-          <Input
-            placeholder="Search for topics, keywords, or specific questions..."
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            className="pl-12 h-14 text-lg"
-            autoFocus
-          />
-        </div>
+      <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
+        <Card className="p-6 shadow-md">
+          <div className="flex items-center justify-between mb-2">
+            <FileText size={24} weight="fill" style={{ color: 'oklch(0.75 0.15 85)' }} />
+            <TrendUp size={20} weight="bold" className="text-green-600" />
+          </div>
+          <div className="text-3xl font-bold mb-1">127</div>
+          <div className="text-sm text-muted-foreground">Total Content</div>
+        </Card>
+
+        <Card className="p-6 shadow-md">
+          <div className="flex items-center justify-between mb-2">
+            <ChartBar size={24} weight="fill" style={{ color: 'oklch(0.60 0.15 85)' }} />
+            <TrendUp size={20} weight="bold" className="text-green-600" />
+          </div>
+          <div className="text-3xl font-bold mb-1">89%</div>
+          <div className="text-sm text-muted-foreground">Avg Quality</div>
+        </Card>
+
+        <Card className="p-6 shadow-md">
+          <div className="flex items-center justify-between mb-2">
+            <Clock size={24} weight="fill" style={{ color: 'oklch(0.75 0.15 85)' }} />
+            <TrendUp size={20} weight="bold" className="text-green-600" />
+          </div>
+          <div className="text-3xl font-bold mb-1">32</div>
+          <div className="text-sm text-muted-foreground">This Month</div>
+        </Card>
+
+        <Card className="p-6 shadow-md">
+          <div className="flex items-center justify-between mb-2">
+            <TrendUp size={24} weight="fill" style={{ color: 'oklch(0.60 0.15 85)' }} />
+            <TrendUp size={20} weight="bold" className="text-green-600" />
+          </div>
+          <div className="text-3xl font-bold mb-1">86%</div>
+          <div className="text-sm text-muted-foreground">Avg SEO</div>
+        </Card>
+      </div>
+
+      <div className="grid lg:grid-cols-2 gap-8">
+        <Card className="p-6 shadow-md">
+          <h3 className="text-xl font-semibold mb-6">Content Generation Trend</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <LineChart data={contentData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.005 85)" />
+              <XAxis dataKey="month" stroke="oklch(0.50 0 0)" />
+              <YAxis stroke="oklch(0.50 0 0)" />
+              <Tooltip />
+              <Line
+                type="monotone"
+                dataKey="posts"
+                stroke="oklch(0.75 0.15 85)"
+                strokeWidth={3}
+                dot={{ fill: 'oklch(0.75 0.15 85)', r: 5 }}
+              />
+            </LineChart>
+          </ResponsiveContainer>
+        </Card>
+
+        <Card className="p-6 shadow-md">
+          <h3 className="text-xl font-semibold mb-6">Content by Platform</h3>
+          <ResponsiveContainer width="100%" height={300}>
+            <BarChart data={platformData}>
+              <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.005 85)" />
+              <XAxis dataKey="name" stroke="oklch(0.50 0 0)" />
+              <YAxis stroke="oklch(0.50 0 0)" />
+              <Tooltip />
+              <Bar dataKey="count" fill="oklch(0.75 0.15 85)" radius={[8, 8, 0, 0]} />
+            </BarChart>
+          </ResponsiveContainer>
+        </Card>
+      </div>
+
+      <Card className="p-6 shadow-md">
+        <h3 className="text-xl font-semibold mb-6">Quality Score Over Time</h3>
+        <ResponsiveContainer width="100%" height={250}>
+          <LineChart data={contentData}>
+            <CartesianGrid strokeDasharray="3 3" stroke="oklch(0.92 0.005 85)" />
+            <XAxis dataKey="month" stroke="oklch(0.50 0 0)" />
+            <YAxis stroke="oklch(0.50 0 0)" domain={[70, 100]} />
+            <Tooltip />
+            <Line
+              type="monotone"
+              dataKey="quality"
+              stroke="oklch(0.60 0.15 85)"
+              strokeWidth={3}
+              dot={{ fill: 'oklch(0.60 0.15 85)', r: 5 }}
+            />
+          </LineChart>
+        </ResponsiveContainer>
       </Card>
-
-      {query.trim().length > 0 && query.trim().length < 3 && (
-        <Card className="p-8 text-center">
-          <p className="text-muted-foreground">Type at least 3 characters to search</p>
-        </Card>
-      )}
-
-      {query.trim().length >= 3 && results.length === 0 && (
-        <Card className="p-12 text-center">
-          <Book size={48} className="mx-auto mb-4 text-muted-foreground opacity-50" />
-          <p className="text-lg font-medium mb-2">No results found</p>
-          <p className="text-sm text-muted-foreground">Try different keywords or browse the documentation index</p>
-        </Card>
-      )}
-
-      {results.length > 0 && (
-        <div className="space-y-3">
-          <p className="text-sm text-muted-foreground">
-            Found {results.length} result{results.length !== 1 ? 's' : ''} for &quot;{query}&quot;
-          </p>
-          
-          {results.map((result, index) => (
-            <Card key={index} className="p-4 hover:shadow-md transition-shadow">
-              <div className="space-y-3">
-                <div className="flex items-start justify-between gap-4">
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-2 mb-2">
-                      <h3 className="font-medium">{result.documentTitle}</h3>
-                      <Badge variant="outline" className="text-xs">
-                        Line {result.lineNumber}
-                      </Badge>
-                      <Badge variant="secondary" className="text-xs">
-                        {documents[result.documentId]?.category}
-                      </Badge>
-                    </div>
-                    <p className="text-sm text-muted-foreground whitespace-pre-wrap line-clamp-3">
-                      {result.snippet}
-                    </p>
-                  </div>
-                  <Button
-                    size="sm"
-                    variant="ghost"
-                    onClick={() => onNavigateToDocument(result.documentId)}
-                  >
-                    <ArrowRight size={16} />
-                  </Button>
-                </div>
-              </div>
-            </Card>
-          ))}
-        </div>
-      )}
     </div>
   )
 }
