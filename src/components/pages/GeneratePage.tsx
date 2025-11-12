@@ -1,243 +1,160 @@
-import { useState } from 'react'
-import { Sparkle, TrendUp, Copy, WarningCircle } from '@phosphor-icons/react'
-import { Button } from '@/components/ui/button'
+import { Book, Rocket, Lightning, Question, Wrench, Code, Cloud, List, ArrowRight, Clock, FileText } from '@phosphor-icons/react'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Textarea } from '@/components/ui/textarea'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { Switch } from '@/components/ui/switch'
 import { Badge } from '@/components/ui/badge'
-import { toast } from 'sonner'
-import { ContentType, Tone, GeneratedContent } from '@/lib/types'
-import { useSettings, createApiRequest } from '@/lib/api'
+import { Button } from '@/components/ui/button'
+import { documents } from '@/lib/documents'
 
-export default function GeneratePage() {
-  const { settings } = useSettings()
-  const [topic, setTopic] = useState('')
-  const [keywords, setKeywords] = useState('')
-  const [contentType, setContentType] = useState<ContentType>('blog_post')
-  const [tone, setTone] = useState<Tone>('professional')
-  const [usePremium, setUsePremium] = useState(false)
-  const [isGenerating, setIsGenerating] = useState(false)
-  const [generatedContent, setGeneratedContent] = useState<GeneratedContent | null>(null)
+const iconMap = {
+  'Book': Book,
+  'Rocket': Rocket,
+  'Lightning': Lightning,
+  'Question': Question,
+  'Wrench': Wrench,
+  'Code': Code,
+  'Cloud': Cloud,
+  'List': List
+}
 
-  const handleGenerate = async () => {
-    if (!topic.trim()) {
-      toast.error('Please enter a topic')
-      return
-    }
+interface DocumentIndexPageProps {
+  onSelectDocument: (docId: string) => void
+}
 
-    if (!settings?.apiKey) {
-      toast.error('Please configure your API key in Settings')
-      return
-    }
-
-    setIsGenerating(true)
-    setGeneratedContent(null)
-
-    try {
-      const apiRequest = await createApiRequest(settings)
-      const result = await apiRequest<GeneratedContent>('/v1/generate', {
-        method: 'POST',
-        body: JSON.stringify({
-          topic,
-          keywords: keywords.split(',').map(k => k.trim()).filter(k => k),
-          content_type: contentType,
-          tone,
-          use_premium: usePremium
-        })
-      })
-
-      setGeneratedContent(result)
-      toast.success('Content generated successfully!')
-    } catch (error) {
-      toast.error(error instanceof Error ? error.message : 'Failed to generate content')
-    } finally {
-      setIsGenerating(false)
+export default function DocumentIndexPage({ onSelectDocument }: DocumentIndexPageProps) {
+  const categories = {
+    'getting-started': {
+      title: 'Getting Started',
+      description: 'Installation guides and quickstart tutorials',
+      color: 'bg-blue-50 text-blue-700 border-blue-200'
+    },
+    'reference': {
+      title: 'Reference',
+      description: 'API documentation and FAQ',
+      color: 'bg-purple-50 text-purple-700 border-purple-200'
+    },
+    'guides': {
+      title: 'Guides',
+      description: 'In-depth tutorials and best practices',
+      color: 'bg-green-50 text-green-700 border-green-200'
+    },
+    'troubleshooting': {
+      title: 'Troubleshooting',
+      description: 'Solutions to common problems',
+      color: 'bg-amber-50 text-amber-700 border-amber-200'
     }
   }
 
-  const handleCopy = () => {
-    if (generatedContent?.content) {
-      navigator.clipboard.writeText(generatedContent.content)
-      toast.success('Content copied to clipboard!')
-    }
-  }
-
-  const getQualityColor = (score: number) => {
-    if (score >= 80) return 'bg-green-500'
-    if (score >= 60) return 'bg-accent'
-    return 'bg-destructive'
-  }
-
-  const getQualityLabel = (score: number) => {
-    if (score >= 80) return 'Excellent'
-    if (score >= 60) return 'Good'
-    return 'Needs Work'
-  }
+  const documentsByCategory = Object.values(documents).reduce((acc, doc) => {
+    if (!acc[doc.category]) acc[doc.category] = []
+    acc[doc.category].push(doc)
+    return acc
+  }, {} as Record<string, typeof documents[string][]>)
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Generate Content</h1>
-        <p className="text-muted-foreground mt-2">
-          Create AI-powered marketing content with built-in quality and SEO scoring
+    <div className="space-y-12">
+      <div className="text-center max-w-3xl mx-auto">
+        <h1 className="text-4xl font-semibold tracking-tight mb-4">SPLANTS Documentation</h1>
+        <p className="text-lg text-muted-foreground leading-relaxed">
+          Comprehensive guides and references for the SPLANTS Marketing Engine. 
+          7,000+ lines across 8 detailed documents covering installation, usage, and troubleshooting.
         </p>
+        <div className="flex flex-wrap gap-3 justify-center mt-6">
+          <Badge variant="outline" className="text-sm px-3 py-1">
+            <FileText className="mr-1" size={14} />
+            8 Documents
+          </Badge>
+          <Badge variant="outline" className="text-sm px-3 py-1">
+            <Clock className="mr-1" size={14} />
+            3-4 hours total reading
+          </Badge>
+          <Badge variant="outline" className="text-sm px-3 py-1">
+            130KB+ content
+          </Badge>
+        </div>
       </div>
 
-      <div className="grid lg:grid-cols-2 gap-6">
-        <Card className="p-6">
-          <div className="space-y-6">
-            <div className="space-y-2">
-              <Label htmlFor="topic" className="text-base font-medium">Topic</Label>
-              <Input
-                id="topic"
-                placeholder="e.g., The benefits of remote work"
-                value={topic}
-                onChange={(e) => setTopic(e.target.value)}
-                disabled={isGenerating}
-              />
-            </div>
+      {Object.entries(categories).map(([categoryId, category]) => {
+        const docs = documentsByCategory[categoryId] || []
+        if (docs.length === 0) return null
 
-            <div className="space-y-2">
-              <Label htmlFor="keywords" className="text-base font-medium">Keywords</Label>
-              <Input
-                id="keywords"
-                placeholder="e.g., remote, productivity, work-life balance"
-                value={keywords}
-                onChange={(e) => setKeywords(e.target.value)}
-                disabled={isGenerating}
-              />
-              <p className="text-sm text-muted-foreground">Separate keywords with commas</p>
-            </div>
-
-            <div className="grid sm:grid-cols-2 gap-4">
-              <div className="space-y-2">
-                <Label htmlFor="content-type" className="text-base font-medium">Content Type</Label>
-                <Select value={contentType} onValueChange={(value) => setContentType(value as ContentType)} disabled={isGenerating}>
-                  <SelectTrigger id="content-type">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="blog_post">Blog Post</SelectItem>
-                    <SelectItem value="social_post">Social Post</SelectItem>
-                    <SelectItem value="email">Email</SelectItem>
-                    <SelectItem value="ad_copy">Ad Copy</SelectItem>
-                  </SelectContent>
-                </Select>
+        return (
+          <div key={categoryId} className="space-y-6">
+            <div>
+              <div className={`inline-flex items-center gap-2 px-3 py-1 rounded-full border ${category.color} text-sm font-medium mb-2`}>
+                {category.title}
               </div>
-
-              <div className="space-y-2">
-                <Label htmlFor="tone" className="text-base font-medium">Tone</Label>
-                <Select value={tone} onValueChange={(value) => setTone(value as Tone)} disabled={isGenerating}>
-                  <SelectTrigger id="tone">
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="professional">Professional</SelectItem>
-                    <SelectItem value="casual">Casual</SelectItem>
-                    <SelectItem value="friendly">Friendly</SelectItem>
-                    <SelectItem value="persuasive">Persuasive</SelectItem>
-                    <SelectItem value="informative">Informative</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
+              <p className="text-muted-foreground">{category.description}</p>
             </div>
 
-            <div className="flex items-center justify-between p-4 bg-secondary rounded-lg">
-              <div className="space-y-0.5">
-                <Label htmlFor="premium" className="text-base font-medium">Premium AI</Label>
-                <p className="text-sm text-muted-foreground">Use multi-model synthesis for higher quality</p>
-              </div>
-              <Switch
-                id="premium"
-                checked={usePremium}
-                onCheckedChange={setUsePremium}
-                disabled={isGenerating}
-              />
-            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {docs.map((doc) => {
+                const Icon = iconMap[doc.icon as keyof typeof iconMap] || Book
 
-            <Button 
-              onClick={handleGenerate}
-              disabled={isGenerating}
-              className="w-full h-12 text-base"
-              size="lg"
-            >
-              <Sparkle className="mr-2" weight="fill" />
-              {isGenerating ? 'Generating...' : 'Generate Content'}
-            </Button>
+                return (
+                  <Card
+                    key={doc.id}
+                    className="p-6 hover:shadow-lg transition-all cursor-pointer group"
+                    onClick={() => onSelectDocument(doc.id)}
+                  >
+                    <div className="flex items-start gap-4 mb-4">
+                      <div className="p-3 bg-primary/10 text-primary rounded-lg group-hover:bg-primary group-hover:text-primary-foreground transition-colors">
+                        <Icon size={24} weight="duotone" />
+                      </div>
+                      <div className="flex-1 min-w-0">
+                        <h3 className="text-lg font-semibold mb-1 group-hover:text-primary transition-colors">
+                          {doc.title}
+                        </h3>
+                        <p className="text-sm text-muted-foreground line-clamp-2">
+                          {doc.description}
+                        </p>
+                      </div>
+                    </div>
+
+                    <div className="flex flex-wrap gap-2 mb-4">
+                      <Badge variant="secondary" className="text-xs">
+                        <Clock className="mr-1" size={12} />
+                        {doc.readingTime}
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {doc.lines} lines
+                      </Badge>
+                      <Badge variant="secondary" className="text-xs">
+                        {doc.size}
+                      </Badge>
+                    </div>
+
+                    <Button
+                      variant="ghost"
+                      className="w-full justify-between group-hover:bg-primary/10"
+                      onClick={(e) => {
+                        e.stopPropagation()
+                        onSelectDocument(doc.id)
+                      }}
+                    >
+                      <span>Read documentation</span>
+                      <ArrowRight className="group-hover:translate-x-1 transition-transform" size={16} />
+                    </Button>
+                  </Card>
+                )
+              })}
+            </div>
           </div>
-        </Card>
+        )
+      })}
 
-        <Card className="p-6">
-          {!generatedContent && !isGenerating && (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8 text-muted-foreground">
-              <Sparkle size={48} className="mb-4 opacity-50" />
-              <p className="text-lg font-medium mb-2">Your content will appear here</p>
-              <p className="text-sm">Fill out the form and click Generate to create AI-powered content</p>
-            </div>
-          )}
-
-          {isGenerating && (
-            <div className="h-full flex flex-col items-center justify-center text-center p-8">
-              <div className="animate-spin mb-4">
-                <Sparkle size={48} className="text-primary" weight="fill" />
-              </div>
-              <p className="text-lg font-medium mb-2">Generating your content...</p>
-              <p className="text-sm text-muted-foreground">This may take a few moments</p>
-            </div>
-          )}
-
-          {generatedContent && !isGenerating && (
-            <div className="space-y-4">
-              <div className="flex items-start justify-between gap-4">
-                <div className="space-y-1">
-                  <h3 className="text-lg font-semibold">Generated Content</h3>
-                  <p className="text-sm text-muted-foreground">{generatedContent.topic}</p>
-                </div>
-                <Button onClick={handleCopy} variant="outline" size="sm">
-                  <Copy className="mr-2" />
-                  Copy
-                </Button>
-              </div>
-
-              <div className="flex gap-2">
-                <Badge variant="secondary" className="gap-1">
-                  <TrendUp size={14} />
-                  Quality: {generatedContent.quality_score}
-                </Badge>
-                <Badge variant="secondary" className="gap-1">
-                  <TrendUp size={14} />
-                  SEO: {generatedContent.seo_score}
-                </Badge>
-                <Badge className={`${getQualityColor(generatedContent.quality_score)} text-white`}>
-                  {getQualityLabel(generatedContent.quality_score)}
-                </Badge>
-              </div>
-
-              <div className="bg-muted p-4 rounded-lg max-h-[400px] overflow-y-auto">
-                <p className="whitespace-pre-wrap text-sm leading-relaxed">{generatedContent.content}</p>
-              </div>
-
-              {generatedContent.quality_score < 60 && (
-                <div className="flex gap-2 p-3 bg-amber-50 border border-amber-200 rounded-lg">
-                  <WarningCircle className="text-amber-600 flex-shrink-0 mt-0.5" size={20} />
-                  <div className="text-sm">
-                    <p className="font-medium text-amber-900">Quality could be improved</p>
-                    <p className="text-amber-700">Try enabling Premium AI or refining your keywords</p>
-                  </div>
-                </div>
-              )}
-
-              <div className="pt-2 border-t text-sm text-muted-foreground flex justify-between">
-                <span>Cost: ${generatedContent.cost.toFixed(4)}</span>
-                <span>Generated {new Date(generatedContent.created_at).toLocaleTimeString()}</span>
-              </div>
-            </div>
-          )}
-        </Card>
-      </div>
+      <Card className="p-8 bg-secondary/50 border-dashed">
+        <div className="text-center max-w-2xl mx-auto">
+          <Book size={48} className="mx-auto mb-4 text-muted-foreground" />
+          <h2 className="text-xl font-semibold mb-2">Need Help Finding Something?</h2>
+          <p className="text-muted-foreground mb-4">
+            Use the search function to quickly find specific topics across all documentation, 
+            or start with the Documentation Index for a guided tour.
+          </p>
+          <Button onClick={() => onSelectDocument('doc-index')} variant="outline">
+            <List className="mr-2" size={16} />
+            View Documentation Index
+          </Button>
+        </div>
+      </Card>
     </div>
   )
 }

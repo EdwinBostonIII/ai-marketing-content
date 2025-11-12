@@ -1,134 +1,149 @@
-# Planning Guide
+# SPLANTS Documentation Hub - Product Requirements Document
 
-A simple, family-friendly web interface that transforms a powerful marketing AI backend into an accessible tool for non-technical users to generate, manage, and analyze AI-powered content.
+## Mission Statement
 
-**Experience Qualities**: 
-1. **Approachable** - The interface should feel welcoming and easy to understand, removing all technical jargon and presenting complex AI capabilities through simple forms and clear labels.
-2. **Confident** - Users should feel assured by visible quality scores, cost tracking, and clear feedback that the AI is working intelligently on their behalf.
-3. **Professional** - While simple, the design should convey capability and trustworthiness, positioning this as a superior alternative to generic subscription services.
+A comprehensive, beautifully organized documentation browser that transforms 7,000+ lines of SPLANTS Marketing Engine documentation into an accessible, searchable, and delightful user experience.
+
+**Experience Qualities**:
+1. **Clarity** - Information is organized hierarchically and intuitively discoverable
+2. **Accessibility** - Complex technical concepts presented in digestible, visual chunks
+3. **Efficiency** - Users find what they need quickly through smart search and navigation
 
 **Complexity Level**: Light Application (multiple features with basic state)
-  - The app provides four distinct feature areas (Generate, Library, Analytics, Settings) with form inputs, data display, and API integration, but without requiring user accounts or complex state management beyond API communication and local settings.
+- Single-purpose documentation browsing
+- Multiple documents with navigation
+- Search and filter capabilities
+- Bookmarking and progress tracking
 
 ## Essential Features
 
-### Content Generation
-- **Functionality**: Form-based interface to create AI-generated marketing content with configurable parameters
-- **Purpose**: Democratizes access to sophisticated multi-model AI synthesis that would otherwise require technical expertise
-- **Trigger**: User navigates to Generate page and fills out content form
-- **Progression**: Select content type → Enter topic and keywords → Choose tone → Toggle premium AI → Click Generate → View generated content with quality/SEO scores → Copy or regenerate
-- **Success criteria**: Users can generate content in under 60 seconds with visible quality metrics; error messages are clear and actionable
+### 1. Document Browser
+- **Functionality**: Display full documentation with proper markdown rendering
+- **Purpose**: Make 7,000+ lines of docs readable and navigable
+- **Trigger**: User selects document from sidebar or index
+- **Progression**: Select document → Load content → Render markdown → Display with TOC → Navigate sections
+- **Success criteria**: All markdown formats render correctly, navigation is smooth
 
-### Content Library Management
-- **Functionality**: Browsable history of all generated content with search, filter, and management capabilities
-- **Purpose**: Provides organization and reusability, preventing loss of previous work and enabling content strategy overview
-- **Trigger**: User navigates to Library page
-- **Progression**: View table of past content → Filter by type/date → Click to expand full content → Copy to clipboard → Delete if needed
-- **Success criteria**: Users can find any previous content within 10 seconds; table loads smoothly even with 100+ items
+### 2. Smart Search
+- **Functionality**: Full-text search across all documentation with highlighted results
+- **Purpose**: Help users find specific information instantly
+- **Trigger**: User types in search bar
+- **Progression**: Type query → Debounced search → Show results with context → Click result → Jump to location
+- **Success criteria**: Sub-second search, relevant results, proper highlighting
 
-### Analytics Dashboard
-- **Functionality**: Visual charts and metrics displaying content performance, quality trends, and ROI calculations
-- **Purpose**: Demonstrates the superior value proposition over "dumb" subscription services by surfacing built-in intelligence
-- **Trigger**: User navigates to Dashboard page
-- **Progression**: View dashboard → See total costs → Review quality score trends → Check monthly content volume → Understand ROI metrics
-- **Success criteria**: Non-technical users can understand their usage patterns and cost-benefit without explanation
+### 3. Quick Navigation Index
+- **Functionality**: Visual card-based index showing all documentation sections
+- **Purpose**: Provide overview of what's available and quick access
+- **Trigger**: User lands on home page or clicks "Documentation Index"
+- **Progression**: View index → Browse categories → Click card → Navigate to document
+- **Success criteria**: All 8 major documents accessible, clear categorization
 
-### Settings Configuration
-- **Functionality**: Simple form to configure API keys, budget limits, and integration webhooks
-- **Purpose**: Gives users control over costs and connections while maintaining simplicity
-- **Trigger**: User navigates to Settings page
-- **Progression**: Enter API key → Set monthly budget → Add webhook URLs → Save settings → See confirmation
-- **Success criteria**: Settings persist between sessions; users understand the impact of each setting
+### 4. Table of Contents Sidebar
+- **Functionality**: Auto-generated TOC from document headings with scroll-spy
+- **Purpose**: Show document structure and enable quick section jumping
+- **Trigger**: Document loads
+- **Progression**: Parse headings → Generate TOC → Track scroll position → Highlight current section
+- **Success criteria**: TOC syncs with scroll, click jumps to section
+
+### 5. Reading Progress Tracking
+- **Functionality**: Save user's reading position and mark completed sections
+- **Purpose**: Help users track their learning journey through extensive docs
+- **Trigger**: User scrolls through document
+- **Progression**: Track position → Save to KV → Show progress indicator → Restore on return
+- **Success criteria**: Progress persists between sessions, visual feedback
 
 ## Edge Case Handling
-- **API Connection Failures**: Show friendly error messages with retry buttons rather than technical error codes
-- **Empty States**: Display helpful onboarding messages when no content exists yet ("Generate your first piece of content to get started!")
-- **Budget Limits**: Warn users when approaching monthly budget limit; prevent generation when exceeded with clear upgrade path
-- **Invalid API Keys**: Detect and surface API key issues immediately on the Settings page with links to documentation
-- **Long Generation Times**: Show animated loading states with progress indicators; allow cancellation if supported by backend
-- **Mobile Responsiveness**: Gracefully collapse complex tables and charts into mobile-friendly views
+
+- **Empty search results** - Show helpful suggestions and popular topics
+- **Long documents** - Implement virtual scrolling and lazy loading
+- **Broken markdown** - Graceful fallback rendering
+- **Mobile viewing** - Responsive layout with collapsible sidebar
+- **Deep linking** - Support direct URLs to specific sections
 
 ## Design Direction
-The design should feel professional yet approachable—like a premium SaaS tool that happens to be simple to use. Think of the clarity of Stripe's dashboard combined with the friendliness of Notion. The interface should use a minimal approach where the content itself is the hero, with controls and metrics providing subtle but confident support.
+
+The design should feel like a premium technical documentation site - clean, professional, focused on readability. Think Stripe Docs meets Notion. The interface should fade into the background, letting the content shine. Whitespace is generous, typography is impeccable, and navigation feels effortless.
 
 ## Color Selection
-Complementary (opposite colors) - A sophisticated blue-purple primary color evokes trust and intelligence (AI/tech) while a warm amber accent creates approachable energy and highlights important actions.
 
-- **Primary Color**: Deep Blue-Purple (oklch(0.45 0.15 270)) - Communicates intelligence, trustworthiness, and premium AI capabilities
-- **Secondary Colors**: Soft neutral grays (oklch(0.96 0 0)) for backgrounds and cards, creating breathing room without competing with content
-- **Accent Color**: Warm Amber (oklch(0.70 0.15 70)) - Draws attention to primary actions and success states with approachable energy
-- **Foreground/Background Pairings**:
-  - Background (White oklch(1 0 0)): Dark text (oklch(0.2 0 0)) - Ratio 16.1:1 ✓
-  - Card (Light Gray oklch(0.98 0 0)): Dark text (oklch(0.2 0 0)) - Ratio 15.3:1 ✓
-  - Primary (Blue-Purple oklch(0.45 0.15 270)): White text (oklch(1 0 0)) - Ratio 6.8:1 ✓
-  - Secondary (Light Gray oklch(0.96 0 0)): Dark text (oklch(0.25 0 0)) - Ratio 11.2:1 ✓
-  - Accent (Amber oklch(0.70 0.15 70)): Dark text (oklch(0.2 0 0)) - Ratio 7.3:1 ✓
-  - Muted (Mid Gray oklch(0.94 0 0)): Muted text (oklch(0.50 0 0)) - Ratio 6.1:1 ✓
+**Triadic color scheme** balanced for technical documentation with warm accents for approachability.
+
+- **Primary Color (Deep Blue)**: `oklch(0.45 0.09 250)` - Professional, trustworthy, technical depth. Used for primary navigation and interactive elements.
+- **Secondary Color (Soft Slate)**: `oklch(0.95 0.01 250)` - Neutral, recessive, content-focused. Used for backgrounds and subtle UI elements.
+- **Accent Color (Warm Orange)**: `oklch(0.70 0.13 50)` - Attention, energy, helpful. Used for highlights, badges, and calls-to-action.
+
+**Foreground/Background Pairings**:
+- **Background (Pure White)** `oklch(1 0 0)`: Dark text `oklch(0.2 0 0)` - Ratio 16.4:1 ✓
+- **Card (Light Gray)** `oklch(0.98 0 0)`: Dark text `oklch(0.2 0 0)` - Ratio 14.8:1 ✓
+- **Primary (Deep Blue)** `oklch(0.45 0.09 250)`: White text `oklch(1 0 0)` - Ratio 7.2:1 ✓
+- **Accent (Warm Orange)** `oklch(0.70 0.13 50)`: Dark text `oklch(0.2 0 0)` - Ratio 6.1:1 ✓
+- **Muted (Subtle Gray)** `oklch(0.92 0 0)`: Medium text `oklch(0.45 0 0)` - Ratio 5.8:1 ✓
 
 ## Font Selection
-Clean, highly legible sans-serif typography that balances professionalism with approachability—Inter provides excellent readability at all sizes while maintaining a modern, tech-forward personality.
 
-- **Typographic Hierarchy**: 
-  - H1 (Page Titles): Inter SemiBold/32px/tight tracking (-0.02em) - Used for main page headers
-  - H2 (Section Headers): Inter SemiBold/24px/tight tracking (-0.01em) - Used for card titles and major sections
-  - H3 (Subsections): Inter Medium/18px/normal tracking - Used for form labels and list headers
-  - Body (Content): Inter Regular/16px/relaxed leading (1.6) - Used for paragraphs and descriptions
-  - Small (Metadata): Inter Regular/14px/normal leading - Used for timestamps, helper text, metrics
-  - Label (Form Labels): Inter Medium/14px/normal tracking - Used for input labels with slightly heavier weight
-  - Button Text: Inter Medium/16px/tight tracking - Used for all button labels
+Professional, highly readable typeface optimized for technical documentation with excellent number rendering.
+
+- **Typographic Hierarchy**:
+  - **H1 (Document Title)**: Inter SemiBold/32px/tight (-0.02em)/1.2 line height
+  - **H2 (Major Section)**: Inter SemiBold/24px/tight (-0.01em)/1.3 line height
+  - **H3 (Subsection)**: Inter Medium/20px/normal/1.4 line height
+  - **H4 (Detail Header)**: Inter Medium/16px/normal/1.5 line height
+  - **Body (Content)**: Inter Regular/16px/normal/1.65 line height
+  - **Caption (Metadata)**: Inter Regular/14px/normal/1.5 line height
+  - **Code**: SF Mono/14px/normal/1.5 line height
 
 ## Animations
-Animations should be purposeful and subtle—reinforcing actions rather than decorating the interface. The motion language should feel intelligent and responsive, like the AI itself is reacting to user input.
 
-- **Purposeful Meaning**: Smooth transitions between pages suggest seamless navigation through a cohesive system; loading states with subtle pulse animations convey active AI processing
-- **Hierarchy of Movement**: Primary actions (Generate button) get satisfying press animations; quality scores count up when revealed; dashboard charts animate in with staggered delays to guide attention
+**Subtle and functional** - animations serve navigation clarity and provide feedback, never decoration.
+
+- **Purposeful Meaning**: Smooth transitions between documents establish spatial relationships. Search results fade in to indicate new content. TOC highlights slide to show position changes.
+- **Hierarchy of Movement**: 
+  1. **Primary** - Page transitions and document loads (300ms ease-out)
+  2. **Secondary** - Search results and filter changes (200ms ease-in-out)
+  3. **Tertiary** - Hover states and micro-interactions (150ms ease-in-out)
 
 ## Component Selection
+
 - **Components**: 
-  - `Card` for content containers (Generate form, Library items, Dashboard widgets, Settings panels)
-  - `Button` with variants (default for Generate, outline for secondary actions, destructive for delete)
-  - `Input`, `Textarea` for text entry with clear labels
-  - `Select` for Content Type and Tone dropdowns
-  - `Switch` for Premium AI toggle
-  - `Table` for Content Library with sortable columns
-  - `Badge` for content type tags and status indicators
-  - `Tabs` for potential multi-section views
-  - `Dialog` for delete confirmations
-  - `Separator` for visual section breaks
-  - `Progress` for budget usage visualization
-  - `Skeleton` for loading states
-  - `Toast` (sonner) for success/error notifications
+  - `ScrollArea` for document content with custom scrollbar styling
+  - `Card` for document index grid with hover elevation
+  - `Input` with `MagnifyingGlass` icon for search
+  - `Tabs` for switching between guides/references
+  - `Badge` for document metadata (reading time, lines, size)
+  - `Button` for navigation and actions
+  - `Separator` for visual hierarchy
+  - `Sidebar` for navigation structure
   
-- **Customizations**: 
-  - Custom stat cards for dashboard metrics with large numbers and trend indicators
-  - Custom quality score badges with color coding (red <60, amber 60-79, green 80+)
-  - Custom empty state illustrations using simple SVG graphics
+- **Customizations**:
+  - Custom markdown renderer with syntax highlighting
+  - Scroll-spy TOC with smooth scrolling
+  - Search result highlighter component
+  - Reading progress indicator
   
-- **States**: 
-  - Buttons: Hover shows slight scale (1.02) and color shift; Active shows press down; Disabled shows reduced opacity with not-allowed cursor
-  - Inputs: Focus shows accent color ring; Error shows destructive color ring with shake animation
-  - Cards: Hover on interactive cards shows subtle shadow lift
+- **States**:
+  - Search: Empty, Loading, Results, No Results
+  - Documents: Loading skeleton, Loaded, Error
+  - TOC: Collapsed (mobile), Expanded (desktop), Active section highlighted
+  - Progress: Unread, In Progress, Completed
   
-- **Icon Selection**: 
-  - `Sparkles` for AI/generation features
-  - `Article`, `ChatCircle`, `EnvelopeSimple` for content types
-  - `TrendUp` for analytics/quality
-  - `Database` for library
-  - `Gear` for settings
-  - `Copy`, `Trash` for actions
-  - `ChartBar`, `ChartLine` for dashboard
-  - `Warning` for budget alerts
+- **Icon Selection**:
+  - `Book` - Documentation index
+  - `MagnifyingGlass` - Search
+  - `ListBullets` - Table of contents
+  - `BookmarkSimple` - Saved/bookmarked
+  - `CheckCircle` - Completed sections
+  - `ArrowRight` - Navigation
+  - `CaretRight` - Expandable sections
   
 - **Spacing**: 
-  - Page padding: `p-6 md:p-8`
-  - Card padding: `p-6`
-  - Section gaps: `gap-6`
-  - Form field gaps: `gap-4`
-  - Inline element gaps: `gap-2`
+  - Container: `max-w-7xl mx-auto px-6`
+  - Section gaps: `gap-12` (major), `gap-6` (subsections)
+  - Content margins: `mb-8` (h2), `mb-4` (h3), `mb-3` (p)
+  - Card padding: `p-6` (standard), `p-8` (featured)
   
 - **Mobile**: 
-  - Navigation collapses to bottom tab bar on mobile
-  - Tables transform to stacked cards on mobile
-  - Dashboard charts stack vertically on mobile
-  - Form fields use full width on mobile
-  - Large buttons for easy touch targets (min-h-11)
+  - Collapsible sidebar with overlay on mobile
+  - Sticky search bar at top
+  - Full-width content on small screens
+  - TOC as bottom sheet on mobile
+  - Reading progress as sticky top bar

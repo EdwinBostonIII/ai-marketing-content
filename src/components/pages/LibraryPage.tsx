@@ -1,260 +1,174 @@
-import { useState, useEffect } from 'react'
-import { Database, Copy, Trash, MagnifyingGlass, Article, ChatCircle, EnvelopeSimple, Megaphone } from '@phosphor-icons/react'
+import { useState, useEffect, useRef } from 'react'
+import { ArrowLeft, ListBullets, BookmarkSimple } from '@phosphor-icons/react'
 import { Button } from '@/components/ui/button'
 import { Card } from '@/components/ui/card'
-import { Input } from '@/components/ui/input'
 import { Badge } from '@/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select'
-import { toast } from 'sonner'
-import { GeneratedContent, ContentType } from '@/lib/types'
-import { useSettings, createApiRequest } from '@/lib/api'
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-} from '@/components/ui/alert-dialog'
+import { ScrollArea } from '@/components/ui/scroll-area'
+import { documents, documentContent, parseMarkdownTOC } from '@/lib/documents'
+import { TOCItem } from '@/lib/doc-types'
+import { useKV } from '@github/spark/hooks'
+import MarkdownRenderer from '@/components/MarkdownRenderer'
+import { cn } from '@/lib/utils'
 
-export default function LibraryPage() {
-  const { settings } = useSettings()
-  const [contents, setContents] = useState<GeneratedContent[]>([])
-  const [filteredContents, setFilteredContents] = useState<GeneratedContent[]>([])
-  const [isLoading, setIsLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState('')
-  const [filterType, setFilterType] = useState<ContentType | 'all'>('all')
-  const [deleteId, setDeleteId] = useState<string | null>(null)
-  const [expandedId, setExpandedId] = useState<string | null>(null)
+interface DocumentViewerPageProps {
+  documentId: string
+  onBack: () => void
+}
+
+export default function DocumentViewerPage({ documentId, onBack }: DocumentViewerPageProps) {
+  const doc = documents[documentId]
+  const content = documentContent[documentId]
+  const [toc, setToc] = useState<TOCItem[]>([])
+  const [activeSection, setActiveSection] = useState<string>('')
+  const [showTOC, setShowTOC] = useState(true)
+  const contentRef = useRef<HTMLDivElement>(null)
+  const [bookmarked, setBookmarked] = useKV<string[]>('doc-bookmarks', [])
+  const [scrollProgress, setScrollProgress] = useState(0)
+
+  const isBookmarked = bookmarked?.includes(documentId) || false
 
   useEffect(() => {
-    loadContent()
+    if (content) {
+      const tocItems = parseMarkdownTOC(content)
+      setToc(tocItems)
+    }
+  }, [content])
+
+  useEffect(() => {
+    const handleScroll = () => {
+      if (!contentRef.current) return
+      
+      const scrollTop = contentRef.current.scrollTop
+      const scrollHeight = contentRef.current.scrollHeight - contentRef.current.clientHeight
+      const progress = (scrollTop / scrollHeight) * 100
+      setScrollProgress(Math.min(100, Math.max(0, progress)))
+    }
+
+    const currentRef = contentRef.current
+    if (currentRef) {
+      currentRef.addEventListener('scroll', handleScroll)
+      return () => currentRef.removeEventListener('scroll', handleScroll)
+    }
   }, [])
 
-  useEffect(() => {
-    filterContent()
-  }, [contents, searchTerm, filterType])
+  const toggleBookmark = () => {
+    setBookmarked((current) => {
+      const bookmarks = current || []
+      if (bookmarks.includes(documentId)) {
+        return bookmarks.filter(id => id !== documentId)
+      } else {
+        return [...bookmarks, documentId]
+      }
+    })
+  }
 
-  const loadContent = async () => {
-    if (!settings?.apiKey) {
-      setIsLoading(false)
-      return
-    }
-
-    try {
-      const apiRequest = await createApiRequest(settings)
-      const result = await apiRequest<GeneratedContent[]>('/v1/content', {
-        method: 'GET'
-      })
-      setContents(result)
-    } catch (error) {
-      toast.error('Failed to load content library')
-    } finally {
-      setIsLoading(false)
+  const scrollToSection = (id: string) => {
+    const element = document.getElementById(id)
+    if (element && contentRef.current) {
+      const top = element.offsetTop - contentRef.current.offsetTop - 80
+      contentRef.current.scrollTo({ top, behavior: 'smooth' })
+      setActiveSection(id)
     }
   }
 
-  const filterContent = () => {
-    let filtered = contents
-
-    if (filterType !== 'all') {
-      filtered = filtered.filter(c => c.content_type === filterType)
-    }
-
-    if (searchTerm) {
-      const term = searchTerm.toLowerCase()
-      filtered = filtered.filter(c =>
-        c.topic.toLowerCase().includes(term) ||
-        c.content.toLowerCase().includes(term)
-      )
-    }
-
-    setFilteredContents(filtered)
+  const renderTOCItems = (items: TOCItem[], level = 0) => {
+    return items.map((item) => (
+      <div key={item.id}>
+        <button
+          onClick={() => scrollToSection(item.id)}
+          className={cn(
+            'w-full text-left text-sm py-1.5 px-3 rounded transition-colors',
+            activeSection === item.id
+              ? 'bg-primary/10 text-primary font-medium'
+              : 'text-muted-foreground hover:text-foreground hover:bg-muted'
+          )}
+          style={{ paddingLeft: `${(level + 1) * 12}px` }}
+        >
+          {item.title}
+        </button>
+        {item.children && item.children.length > 0 && (
+          <div className="mt-1">
+            {renderTOCItems(item.children, level + 1)}
+          </div>
+        )}
+      </div>
+    ))
   }
 
-  const handleCopy = (content: string) => {
-    navigator.clipboard.writeText(content)
-    toast.success('Content copied to clipboard!')
-  }
-
-  const handleDelete = async () => {
-    if (!deleteId || !settings) return
-
-    try {
-      const apiRequest = await createApiRequest(settings)
-      await apiRequest(`/v1/content/${deleteId}`, {
-        method: 'DELETE'
-      })
-      setContents(contents.filter(c => c.id !== deleteId))
-      toast.success('Content deleted successfully')
-    } catch (error) {
-      toast.error('Failed to delete content')
-    } finally {
-      setDeleteId(null)
-    }
-  }
-
-  const getContentIcon = (type: ContentType) => {
-    switch (type) {
-      case 'blog_post':
-        return <Article size={20} />
-      case 'social_post':
-        return <ChatCircle size={20} />
-      case 'email':
-        return <EnvelopeSimple size={20} />
-      case 'ad_copy':
-        return <Megaphone size={20} />
-    }
-  }
-
-  const getTypeLabel = (type: ContentType) => {
-    return type.split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' ')
-  }
-
-  if (isLoading) {
+  if (!doc || !content) {
     return (
       <div className="flex items-center justify-center h-96">
-        <div className="text-center">
-          <Database size={48} className="mx-auto mb-4 opacity-50 animate-pulse" />
-          <p className="text-muted-foreground">Loading content library...</p>
-        </div>
+        <p className="text-muted-foreground">Document not found</p>
       </div>
     )
   }
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-3xl font-semibold tracking-tight">Content Library</h1>
-        <p className="text-muted-foreground mt-2">
-          Browse and manage all your generated content
-        </p>
+    <div className="flex flex-col h-[calc(100vh-180px)]">
+      <div className="flex items-center gap-4 mb-6">
+        <Button onClick={onBack} variant="ghost" size="sm">
+          <ArrowLeft className="mr-2" size={16} />
+          Back to Index
+        </Button>
+        <div className="flex-1" />
+        <Button
+          onClick={() => setShowTOC(!showTOC)}
+          variant="outline"
+          size="sm"
+          className="hidden md:flex"
+        >
+          <ListBullets className="mr-2" size={16} />
+          {showTOC ? 'Hide' : 'Show'} Contents
+        </Button>
+        <Button
+          onClick={toggleBookmark}
+          variant={isBookmarked ? 'default' : 'outline'}
+          size="sm"
+        >
+          <BookmarkSimple className="mr-2" size={16} weight={isBookmarked ? 'fill' : 'regular'} />
+          {isBookmarked ? 'Bookmarked' : 'Bookmark'}
+        </Button>
       </div>
 
-      <Card className="p-6">
-        <div className="flex flex-col sm:flex-row gap-4 mb-6">
+      <div className="flex-1 grid md:grid-cols-[1fr_300px] gap-6 min-h-0">
+        <Card className="flex flex-col overflow-hidden">
+          <div className="p-6 border-b bg-card">
+            <h1 className="text-3xl font-semibold tracking-tight mb-2">{doc.title}</h1>
+            <p className="text-muted-foreground mb-4">{doc.description}</p>
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="secondary">{doc.readingTime}</Badge>
+              <Badge variant="secondary">{doc.lines} lines</Badge>
+              <Badge variant="secondary">{doc.size}</Badge>
+            </div>
+          </div>
+
           <div className="relative flex-1">
-            <MagnifyingGlass className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" size={20} />
-            <Input
-              placeholder="Search content..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="pl-10"
+            <div
+              className="absolute top-0 left-0 right-0 h-1 bg-primary transition-all z-10"
+              style={{ width: `${scrollProgress}%` }}
             />
+            <ScrollArea className="h-full">
+              <div ref={contentRef} className="p-8">
+                <MarkdownRenderer content={content} />
+              </div>
+            </ScrollArea>
           </div>
-          <Select value={filterType} onValueChange={(value) => setFilterType(value as ContentType | 'all')}>
-            <SelectTrigger className="w-full sm:w-[200px]">
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value="all">All Types</SelectItem>
-              <SelectItem value="blog_post">Blog Posts</SelectItem>
-              <SelectItem value="social_post">Social Posts</SelectItem>
-              <SelectItem value="email">Emails</SelectItem>
-              <SelectItem value="ad_copy">Ad Copy</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
+        </Card>
 
-        {!settings?.apiKey ? (
-          <div className="text-center py-12">
-            <Database size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">Configure API Key</p>
-            <p className="text-sm text-muted-foreground">
-              Set up your API key in Settings to view your content library
-            </p>
-          </div>
-        ) : filteredContents.length === 0 ? (
-          <div className="text-center py-12">
-            <Database size={48} className="mx-auto mb-4 opacity-50" />
-            <p className="text-lg font-medium mb-2">
-              {contents.length === 0 ? 'No content yet' : 'No matching content'}
-            </p>
-            <p className="text-sm text-muted-foreground">
-              {contents.length === 0
-                ? 'Generate your first piece of content to get started'
-                : 'Try adjusting your search or filters'}
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-3">
-            {filteredContents.map((item) => (
-              <Card key={item.id} className="p-4 hover:shadow-md transition-shadow">
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex items-start gap-3 flex-1 min-w-0">
-                      <div className="text-primary mt-1">
-                        {getContentIcon(item.content_type)}
-                      </div>
-                      <div className="flex-1 min-w-0">
-                        <h3 className="font-medium text-base mb-1 truncate">{item.topic}</h3>
-                        <div className="flex flex-wrap gap-2 text-sm text-muted-foreground">
-                          <Badge variant="outline">{getTypeLabel(item.content_type)}</Badge>
-                          <Badge variant="outline">Quality: {item.quality_score}</Badge>
-                          <Badge variant="outline">SEO: {item.seo_score}</Badge>
-                          <span className="text-xs">
-                            {new Date(item.created_at).toLocaleDateString()}
-                          </span>
-                        </div>
-                      </div>
-                    </div>
-                    <div className="flex gap-2">
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => handleCopy(item.content)}
-                      >
-                        <Copy size={16} />
-                      </Button>
-                      <Button
-                        size="sm"
-                        variant="outline"
-                        onClick={() => setDeleteId(item.id)}
-                      >
-                        <Trash size={16} />
-                      </Button>
-                    </div>
-                  </div>
-
-                  {expandedId === item.id && (
-                    <div className="bg-muted p-3 rounded-lg text-sm">
-                      <p className="whitespace-pre-wrap">{item.content}</p>
-                    </div>
-                  )}
-
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => setExpandedId(expandedId === item.id ? null : item.id)}
-                    className="w-full text-xs"
-                  >
-                    {expandedId === item.id ? 'Show less' : 'Show full content'}
-                  </Button>
-                </div>
-              </Card>
-            ))}
-          </div>
+        {showTOC && toc.length > 0 && (
+          <Card className="p-6 hidden md:block overflow-hidden">
+            <h2 className="text-lg font-semibold mb-4 flex items-center gap-2">
+              <ListBullets size={20} />
+              Table of Contents
+            </h2>
+            <ScrollArea className="h-[calc(100%-3rem)]">
+              <div className="space-y-1">
+                {renderTOCItems(toc)}
+              </div>
+            </ScrollArea>
+          </Card>
         )}
-      </Card>
-
-      <AlertDialog open={!!deleteId} onOpenChange={(open) => !open && setDeleteId(null)}>
-        <AlertDialogContent>
-          <AlertDialogHeader>
-            <AlertDialogTitle>Delete content?</AlertDialogTitle>
-            <AlertDialogDescription>
-              This action cannot be undone. This will permanently delete this content from your library.
-            </AlertDialogDescription>
-          </AlertDialogHeader>
-          <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={handleDelete} className="bg-destructive text-destructive-foreground">
-              Delete
-            </AlertDialogAction>
-          </AlertDialogFooter>
-        </AlertDialogContent>
-      </AlertDialog>
+      </div>
     </div>
   )
 }
